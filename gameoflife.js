@@ -2,11 +2,20 @@
 const ROWS = 50;
 const COLS = 80;
 var grid;
+var next;
 
 function setup(){
   createCanvas(800,500);
   background(240);
 
+  
+
+  grid = makeGrid();
+  grid = fillGridRandom(grid);
+}
+
+function draw(){
+  clear();
   line(1,1,width,1);
   line(1,1,1,height);
   line(1,height-1,width-1,height-1);
@@ -21,21 +30,48 @@ function setup(){
 		}
 	}
 
-  grid = makeGrid();
-  grid = fillGridRandom(grid);
-}
-
-function draw(){
   for ( let i=0; i < ROWS; i++ ) {
     for ( let j=0; j < COLS; j++ ) {
 
       if(grid[i][j] === 1){
         fill(51, 204, 51);
-        ellipse((j*(height/ROWS)+(height/ROWS/2)), (i*(width/COLS)+(width/COLS/2)), (height/ROWS/2));
+        point((j*(height/ROWS)+(height/ROWS/2)), (i*(width/COLS)+(width/COLS/2)));
+        stroke('green');
+			  strokeWeight(7);
       }
     }
   }
-  return grid;
+
+  next = makeGrid();
+
+  for ( let i=0; i < ROWS; i++ ) {
+    for ( let j=0; j < COLS; j++ ) {
+      
+      let neighbours = countNeighbours(grid,i,j);
+
+      if(grid[i][j] === 0){
+        if(neighbours === 3){
+          next[i][j] = 1;
+        }else{
+          next[i][j] = 0;
+        }
+      }
+
+      if(grid[i][j] === 1){
+        if(neighbours < 2){
+          next[i][j] = 0;
+        }else if(neighbours === 2 || neighbours === 3){
+          next[i][j] = 1;
+        }else if(neighbours > 3){
+          next[i][j] = 0;
+        }
+      }
+
+    }
+  }
+
+  grid = next;
+  
 }
 
 function makeGrid(){
@@ -54,4 +90,33 @@ function fillGridRandom(grid){
     }
   }
   return grid;
+}
+
+function countNeighbours(grid,i,j){
+  let sum = 0;
+  try{
+    sum+=grid[i-1][j-1];
+  }catch{}
+  try{
+    sum+=grid[i-1][j];
+  }catch{}
+  try{
+    sum+=grid[i-1][j+1];
+  }catch{}
+  try{
+    sum+=grid[i][j-1];
+  }catch{}
+  try{
+    sum+=grid[i][j+1];
+  }catch{}
+  try{
+    sum+=grid[i+1][j-1];
+  }catch{}
+  try{
+    sum+=grid[i+1][j];
+  }catch{}
+  try{
+    sum+=grid[i+1][j+1];
+  }catch{}
+  return sum;
 }
